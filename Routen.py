@@ -2,6 +2,7 @@
 Class that holds one Tour
 """
 import math
+import CSVHandler
 
 
 class Routen:
@@ -11,13 +12,13 @@ class Routen:
         "EST"
     ]
 
-    tourid = ""
+    tourid: str
 
-    startcountry = ""
-    startcity = ""
+    startcountry: str
+    startcity: str
 
-    endcountry = ""
-    endcity = ""
+    endcountry: str
+    endcity: str
 
     weight = 0
     money = 0
@@ -34,13 +35,19 @@ class Routen:
         self.distance = distance
         self.weight = weight
 
-    def priceperkm(self):
-        if self.distance > 1500:
-            if self.startcountry in self.specialcircle and self.endcountry not in self.specialcircle:
-                self.distance -= 1500
-            elif self.endcountry in self.specialcircle and self.startcountry not in self.specialcircle:
-                self.distance -= 1500
+    def newdistance(self, csvfilehandler: CSVHandler.CSVHandler):
+        entry = csvfilehandler.searchroute(self.startcity, self.endcity)
+        if not entry == []:
+            distance = entry[3]
+            if not distance == 0:
+               self.distance = distance
+            else:
+                print("start: " + self.startcity + "\nende:" + self.endcity)
 
+    """
+    Calculates the value per Kilometer using data from csv file
+    """
+    def priceperkm(self) -> int:
         if self.weight >= 42000:
             return self.money / ((self.distance + 1) * self.amounttodrive())
         return self.money / (self.distance + 1)
